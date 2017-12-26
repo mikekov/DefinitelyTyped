@@ -89,6 +89,15 @@ declare module paper {
         constructor(a: number, c: number, b: number, d: number, tx: number, ty: number);
 
         /**
+         * Creates a 2D affine transform.
+         * @param values - sequence of six numbers (a, c, b, d, tx, ty).
+         * This constructor complements 'values' member.
+         */
+        constructor(values: number[]);
+
+        constructor();
+
+        /**
          * The value that affects the transformation along the x axis when scaling or rotating, positioned at (0, 0) in the transformation matrix.
          */
         a: number;
@@ -122,7 +131,7 @@ declare module paper {
          * The transform values as an array, in the same sequence as they are passed to initialize(a, c,b,d,tx,ty).
          * Read only.
          */
-        values: number;
+        values: number[];
 
         /**
          * The translation of the matrix as a vector.
@@ -999,6 +1008,7 @@ declare module paper {
             applyMatrix: boolean;
             handleSize: number;
             hitTolerance: number;
+            insertItems?: boolean;
 
         };
 
@@ -1052,6 +1062,7 @@ declare module paper {
          */
         static get(id: string): PaperScope;
 
+        createCanvas(width: number, height: number): HTMLCanvasElement;
     }
     /**
      * The Item type allows you to access and modify the items in Paper.js projects. Its functionality is inherited by different project item types such as Path, CompoundPath, Group, Layer and Raster. They each add a layer of functionality that is unique to their type, but share the underlying properties and functions that they inherit from Item.
@@ -1367,7 +1378,7 @@ declare module paper {
          * Rasterizes the item into a newly created Raster object. The item itself is not removed after rasterization.
          * @param resolution [optional] - the resolution of the raster in pixels per inch (DPI). If not specified, the value of view.resolution is used. default: view.resolution
          */
-        rasterize(resolution: number): Raster;
+        rasterize(resolution: number, insert?: boolean): Raster;
 
         /**
          * Checks whether the item's geometry contains the given point.
@@ -2090,6 +2101,10 @@ declare module paper {
          */
         getImageData(rect: Rectangle): ImageData;
 
+        getImageData(): ImageData;
+
+        setImageData(pixels: ImageData);
+
         /**
          *
          *
@@ -2569,6 +2584,10 @@ declare module paper {
              * @param to - the line's ending point
              */
             constructor(from: Point, to: Point);
+
+            constructor(x1: number, y1: number, x2: number, y2: number);
+
+            constructor(properties: {});
 
             /**
              * Creates a linear path item from the properties described by an object literal.
@@ -3236,6 +3255,10 @@ declare module paper {
          */
         deselectAll(): void;
 
+        addLayer(layer: Layer): Layer;
+
+        insertLayer(index: number, layer: Layer): Layer;
+
         /**
          * Perform a hit-test on the items contained within the project at the location of the specified point.
          * The options object allows you to control the specifics of the hit-test and may contain a combination of the following values:
@@ -3300,6 +3323,7 @@ declare module paper {
          */
         importSVG(svg: SVGElement | string, options?: any): Item;
 
+        draw(ctx: CanvasRenderingContext2D, matrix: Matrix, pixelRatio: any): void;
     }
     /**
      * Symbols allow you to place multiple instances of an item in your project. This can save memory, since all instances of a symbol simply refer to the original item and it can speed up moving around complex objects, since internal properties such as segment lists and gradient positions don't need to be updated with every transformation.
@@ -3863,6 +3887,9 @@ declare module paper {
      * The global tool variable only exists in scripts that contain mouse handler functions (onMouseMove, onMouseDown, onMouseDrag, onMouseUp) or a keyboard handler function (onKeyDown, onKeyUp).
      */
     export class Tool {
+        constructor();
+
+        constructor(prop: {});
 
         /**
          * The minimum distance the mouse has to drag before firing the onMouseDrag event, since the last onMouseDrag event.
@@ -4019,6 +4046,7 @@ declare module paper {
          */
         item: Item;
 
+        tool: Tool;
         /**
          * a string representation of the tool event
          */
